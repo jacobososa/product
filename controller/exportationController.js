@@ -1,33 +1,38 @@
-let products = []; // Esto es temporal, puedes usar una base de datos más adelante.
+const Exportation = require('../models/exportation');
 
-exports.createProduct = (req, res) => {
-  const { nameProduct, price, weight } = req.body;
+const createProduct = async (req, res) => {
+  try {
+    const { nameProduct, price, weight } = req.body;
+    const newProduct = new Exportation({ nameProduct, price, weight });
 
-  if (!nameProduct || !price || !weight) {
-    return res.status(400).json({ error: 'Todos los campos son requeridos' });
+    await newProduct.save();
+    res.status(201).json({ message: 'Producto creado exitosamente', data: newProduct });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al crear el producto', error });
   }
-
-  const newProduct = {
-    id: products.length + 1,
-    nameProduct,
-    price,
-    weight
-  };
-
-  products.push(newProduct);
-  res.status(201).json({ message: 'Producto registrado', product: newProduct });
 };
 
-exports.getAllProducts = (req, res) => {
-  res.json(products);
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Exportation.find();
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los productos', error });
+  }
 };
 
-exports.getProductById = (req, res) => {
-  const product = products.find(p => p.id === parseInt(req.params.id));
-
-  if (!product) {
-    return res.status(404).json({ error: 'Producto no encontrado' });
+const getProductById = async (req, res) => {
+  try {
+    const product = await Exportation.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener el producto', error });
   }
+};
 
-  res.json(product);
+module.exports = {
+  createProduct,
+  getAllProducts,
+  getProductById
 };

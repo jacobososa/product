@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const exportationController = require('../controller/exportationController');
 
-const exportationSchema = new mongoose.Schema({
-  nameProduct: { type: String, required: true },
-  price: { type: Number, required: true },
-  weight: { type: Number, required: true }
-});
+router.post('/', exportationController.createProduct);
+router.get('/', exportationController.getAllProducts);
+router.get('/:id', exportationController.getProductById);
 
-module.exports = mongoose.model('Exportation', exportationSchema);
+module.exports = router;
